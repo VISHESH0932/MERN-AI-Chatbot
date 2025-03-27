@@ -1,37 +1,73 @@
 import React from 'react';
-import { Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Logo = () => {
   return (
-    <div style={{
+    <Box
+      sx={{
         display: "flex",
-        marginRight: "auto",
         alignItems: "center",
-        gap: "15px",
-    }}>
+        gap: "12px",
+      }}
+    >
       <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-        <img
-          src="chatgpt.png"
-          alt="openai"
-          width={"30px"}
-          height={"30px"}
-          className="image-inverted"
-          color='inherit'
-        />
-        <Typography 
-          sx={{
-            display: { md: "block", sm: "none", xs: "none" },
-            mr: "auto", // add margin-left for spacing between image and text
-            fontWeight: 800,
-            textShadow: "2px 2px 20px #000",
-            color: "inherit" // inherit color from parent to avoid blue link color
+        <motion.div
+          initial={{ rotate: 0 }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          style={{ display: "flex", alignItems: "center" }}
+        >
+          <img
+            src="chatgpt.png"
+            alt="AI Chat"
+            width={"32px"}
+            height={"32px"}
+            className="image-inverted"
+            style={{ 
+              filter: "drop-shadow(0 0 8px rgba(0, 255, 226, 0.5))", 
+              marginRight: "10px" 
+            }}
+          />
+        </motion.div>
+        <Box 
+          sx={{ 
+            display: { xs: "none", sm: "flex" }, 
+            flexDirection: "column",
+            alignItems: "flex-start"
           }}
         >
-        <span style={{fontSize: "20px" }}>ASK</span>-GPT
-        </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{
+              fontWeight: 800,
+              background: "linear-gradient(90deg, #00fffc, #6c63ff)",
+              backgroundClip: "text",
+              textFillColor: "transparent",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              letterSpacing: "1px",
+              lineHeight: 1.2,
+              m: 0,
+            }}
+          >
+            AI CHAT
+          </Typography>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: "var(--text-muted)",
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              fontWeight: 500
+            }}
+          >
+            Powered by HF
+          </Typography>
+        </Box>
       </Link>
-    </div>
+    </Box>
   );
 };
 

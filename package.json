@@ -1,0 +1,24 @@
+{
+  "name": "ai-mernchatbot",
+  "version": "1.0.0",
+  "description": "MERN stack AI chatbot",
+  "main": "index.js",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && npm run dev",
+    "dev": "cd frontend && npm run dev",
+    "start:be": "cd backend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend"
+  },
+  "keywords": [
+    "mern",
+    "ai",
+    "chatbot",
+    "react",
+    "node"
+  ],
+  "author": "",
+  "license": "ISC"
+} 

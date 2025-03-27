@@ -1,10 +1,17 @@
 import express from "express";
-import {config} from "dotenv";
+import dotenv from 'dotenv';
 import morgan from "morgan";
 import appRouter from "./routes/index.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-config();
+// import { fileURLToPath } from 'url';
+// import { dirname, resolve } from 'path';
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
+
+dotenv.config();
+// dotenv.config({ path:resolve(__dirname, '../../.env') });
 const app = express();
 //middlewares
 app.use(cors({origin:"http://localhost:5173",credentials: true}));
