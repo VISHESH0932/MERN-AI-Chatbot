@@ -1,39 +1,5 @@
 import User from "../models/User.js";
 import hf from '../config/hf-config.js';
-// import { OpenAIApi, ChatCompletionRequestMessage, ChatCompletionResponseMessage } from "openai";
-// export const generationChatCompletion = async (req: Request, res: Response, next: NextFunction) => {
-//     const { message } = req.body;
-//     if (!message) {
-//         return res.status(400).json({ message: "Message is required" });
-//     }
-//     try {
-//         const user = await User.findById(res.locals.jwtData.id);
-//         if (!user) {
-//             return res.status(401).json({ message: "User not registered or token malfunctioned" });
-//         }
-//         // Retrieve user's chat history and append the new message
-//         const chats = user.chats.map(({ role, content }) => ({ role, content }));
-//         chats.push({ role: "user", content: message });
-//         user.chats.push({ role: "user", content: message });
-//         // Send the chat history to the Hugging Face model
-//         const chatResponse = await hf.textGeneration({
-//             model: process.env.HUGGING_FACE_MODEL,
-//             messages: chats,
-//         });
-//         const assistantMessage = chatResponse.generated_text;
-//         if (!assistantMessage) {
-//             return res.status(500).json({ message: "Failed to get response from Hugging Face" });
-//         }
-//         // Append the assistant's response to the chat history and save
-//         user.chats.push({ role: "assistant", content: assistantMessage });
-//         await user.save();
-//         return res.status(200).json({ chats: user.chats });
-//     } catch (error:any) {
-//         console.error(error);
-//         return res.status(500).json({ message: "Something went wrong", error: error.message });
-//     }
-// };
-// chat-controllers.js
 export const generationChatCompletion = async (req, res, next) => {
     const { message } = req.body;
     if (!message) {

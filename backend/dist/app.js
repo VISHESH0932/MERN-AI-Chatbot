@@ -12,7 +12,9 @@ dotenv.config();
 // dotenv.config({ path:resolve(__dirname, '../../.env') });
 const app = express();
 //middlewares
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({
+    origin: ["http://localhost:5173", "https://mern-ai-chatbot-tau.vercel.app"] // Allow frontend
+}));
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(morgan("dev"));
