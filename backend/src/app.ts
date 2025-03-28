@@ -18,11 +18,13 @@ const app = express();
 
 
 app.use(
-    cors({
-      origin:[ "http://localhost:5173","https://mern-ai-chatbot.netlify.app"] // Allow frontend
-     
-    })
-  );
+  cors({
+    origin: ["http://localhost:5173", "https://mern-ai-chatbot.netlify.app"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // This allows cookies and authentication headers
+  })
+);
+
   
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
