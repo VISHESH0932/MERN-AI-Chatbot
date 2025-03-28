@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 //middlewares
 app.use(cors({
-    origin: ["http://localhost:5173", "https://mern-ai-chatbot.netlify.app/"] // Allow frontend
+    origin: ["http://localhost:5173", "https://mern-ai-chatbot.netlify.app"] // Allow frontend
 }));
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
