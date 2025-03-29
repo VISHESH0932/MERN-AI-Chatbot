@@ -1,53 +1,70 @@
+// api-communicator.ts
 import axios from "axios";
 
-// Ensure axios is configured with the correct backend URL
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
-axios.defaults.withCredentials = true; // Allow credentials (cookies, sessions)
+type AuthResponse = {
+  name: string;
+  email: string;
+  token?: string;
+};
 
-// Login User
-export const loginUser = async (email: string, password: string) => {
-  const res = await axios.post("/user/login", { email, password }, { withCredentials: true });
-  if (res.status !== 200) throw new Error("Unable to login");
+type ChatResponse = {
+  message: string;
+};
+
+const api = axios.create({
+  baseURL: "https://mern-ai-chatbot-tau.vercel.app/api/v1",
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
+  const res = await api.post<AuthResponse>("/user/login", { email, password });
+  if (res.data.token) {
+    localStorage.setItem("token", res.data.token);
+  }
   return res.data;
 };
 
-// Signup User
-export const signupUser = async (name: string, email: string, password: string) => {
-  const res = await axios.post("/user/signup", { name, email, password }, { withCredentials: true });
-  if (res.status !== 201) throw new Error("Unable to Signup");
+export const signupUser = async (name: string, email: string, password: string): Promise<AuthResponse> => {
+  const res = await api.post<AuthResponse>("/user/signup", { name, email, password });
+  if (res.data.token) {
+    localStorage.setItem("token", res.data.token);
+  }
   return res.data;
 };
 
-// Check Authentication Status
-export const checkAuthStatus = async () => {
-  const res = await axios.get("/user/auth-status", { withCredentials: true });
-  if (res.status !== 200) throw new Error("Unable to authenticate");
+export const checkAuthStatus = async (): Promise<AuthResponse | null> => {
+  try {
+    const res = await api.get<AuthResponse>("/user/auth-status");
+    return res.data;
+  } catch {
+    return null;
+  }
+};
+
+export const sendChatRequest = async (message: string): Promise<ChatResponse> => {
+  const res = await api.post<ChatResponse>("/chat/new", { message });
   return res.data;
 };
 
-// Send Chat Request
-export const sendChatRequest = async (message: string) => {
-  const res = await axios.post("/chat/new", { message }, { withCredentials: true });
+export const getUserChats = async (): Promise<ChatResponse[]> => {
+  const res = await api.get<ChatResponse[]>("/chat/all-chats");
   return res.data;
 };
 
-// Get User Chats
-export const getUserChats = async () => {
-  const res = await axios.get("/chat/all-chats", { withCredentials: true });
-  if (res.status !== 200) throw new Error("Unable to fetch chats");
+export const deleteUserChats = async (): Promise<{ success: boolean }> => {
+  const res = await api.delete<{ success: boolean }>("/chat/delete");
   return res.data;
 };
 
-// Delete User Chats
-export const deleteUserChats = async () => {
-  const res = await axios.delete("/chat/delete", { withCredentials: true });
-  if (res.status !== 200) throw new Error("Unable to delete chats");
-  return res.data;
-};
-
-// Logout User
-export const logoutUser = async () => {
-  const res = await axios.get("/user/logout", { withCredentials: true });
-  if (res.status !== 200) throw new Error("Unable to logout");
+export const logoutUser = async (): Promise<{ success: boolean }> => {
+  localStorage.removeItem("token");
+  const res = await api.get<{ success: boolean }>("/user/logout");
   return res.data;
 };
