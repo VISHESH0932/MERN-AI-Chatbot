@@ -19,9 +19,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://mern-ai-chatbot.netlify.app"],
+    origin: ["http://localhost:5173", process.env.NETLIFY_FRONTEND_URL || ""].filter(Boolean),
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // This allows cookies and authentication headers
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
