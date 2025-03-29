@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload, VerifyErrors, TokenExpiredError, JsonWebTokenError } from "jsonwebtoken"; // Import specific error types
+// Import the default export for runtime values (functions, error classes)
+import jwt from "jsonwebtoken";
+// Import types separately for type checking (TypeScript resolves these)
+import { JwtPayload, VerifyErrors } from "jsonwebtoken";
 import { COOKIE_NAME } from "./constants.js";
 
 // createToken remains the same
 export const createToken = (id: string, email: string, expiresIn: string) => {
     const payload = { id, email };
-    // Ensure JWT_SECRET is available, otherwise signing will fail silently or throw later
     if (!process.env.JWT_SECRET) {
         console.error("FATAL ERROR: JWT_SECRET environment variable is not set.");
-        throw new Error("JWT Secret is missing in server configuration."); // Throw error early
+        throw new Error("JWT Secret is missing in server configuration.");
     }
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
         expiresIn,
@@ -19,10 +21,10 @@ export const createToken = (id: string, email: string, expiresIn: string) => {
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     // --- Added Logging ---
     console.log(`-----------------------------------------------------`);
-    console.log(`verifyToken called for path: ${req.originalUrl || req.path}`); // Log the full path
-    console.log('Raw Cookies Header:', req.headers.cookie || 'No Cookie Header Sent'); // Log raw header received
-    console.log('req.cookies (parsed, unsigned):', req.cookies); // Log cookies parsed without secret
-    console.log('req.signedCookies (parsed, signed):', req.signedCookies); // Log cookies parsed WITH secret
+    console.log(`verifyToken called for path: ${req.originalUrl || req.path}`);
+    console.log('Raw Cookies Header:', req.headers.cookie || 'No Cookie Header Sent');
+    console.log('req.cookies (parsed, unsigned):', req.cookies);
+    console.log('req.signedCookies (parsed, signed):', req.signedCookies);
     // --- End Added Logging ---
 
     const token = req.signedCookies[`${COOKIE_NAME}`];
@@ -36,32 +38,31 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
         console.warn(`--> Token Not Received or empty for cookie "${COOKIE_NAME}" on path ${req.originalUrl || req.path}. Sending 401.`);
         console.log(`-----------------------------------------------------`);
         // --- End Added Logging ---
-        return res.status(401).json({ message: "Token Not Received" }); // Make sure cookie-parser secret matches signing secret
+        return res.status(401).json({ message: "Token Not Received" });
     }
 
-    // Removed the unnecessary Promise wrapper around jwt.verify
     jwt.verify(token, process.env.JWT_SECRET as string, (err: VerifyErrors | null, success: JwtPayload | string | undefined) => {
         if (err) {
             // --- Improved Error Logging & Response ---
-            console.error(`--> JWT Verification Error on path ${req.originalUrl || req.path}:`, err.message); // Log specific error
+            console.error(`--> JWT Verification Error on path ${req.originalUrl || req.path}:`, err.message);
             let responseMessage = "Token Authentication Failed";
-            if (err instanceof TokenExpiredError) {
+
+            // Access error classes via the 'jwt' default import object
+            if (err instanceof jwt.TokenExpiredError) { // Use jwt.TokenExpiredError
                 responseMessage = "Token Expired";
-            } else if (err instanceof JsonWebTokenError) {
-                // This catches invalid signature, malformed token, etc.
-                responseMessage = "Token Invalid"; // More specific than "Expired"
-                // Potential cause: JWT_SECRET mismatch between signing and verification, or token tampering.
+            } else if (err instanceof jwt.JsonWebTokenError) { // Use jwt.JsonWebTokenError
+                responseMessage = "Token Invalid";
                 console.error("--> Potential causes: JWT_SECRET mismatch, token tampered, malformed token.");
             }
-             console.log(`-----------------------------------------------------`);
+            console.log(`-----------------------------------------------------`);
             return res.status(401).json({ message: responseMessage });
             // --- End Improved Error Handling ---
         } else {
             // --- Success Case ---
             console.log(`--> Token Verification Successful for path ${req.originalUrl || req.path}`);
             console.log(`-----------------------------------------------------`);
-            res.locals.jwtData = success; // Attach decoded payload for subsequent handlers
-            return next(); // Proceed to the next middleware/handler (e.g., verifyUser)
+            res.locals.jwtData = success;
+            return next();
             // --- End Success Case ---
         }
     });
